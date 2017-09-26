@@ -1,0 +1,6 @@
+.idea/
+store/
+*.log
+*.exe*
+
+tmp/
