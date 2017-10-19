@@ -1,5 +1,7 @@
 package utility
 
+// 写于 2017-09-26 预计半年内是生效的。
+
 import (
 	"image"
 	"os"
@@ -32,6 +34,46 @@ type WechatResponse struct {
 	RefreshToken string `json:"refresh_token"`
 	Openid string `json:"openid"`
 	Scope string `json:"scope"`
+}
+
+/******************************************
+*        微信公众号相关结构体             *
+*                                         *
+*******************************************/
+
+// 通用错误结构体
+type WechatErrMsg struct {
+	Errcode int `json:"errcode"`
+	Errmsg string `json:"errmsg"`
+}
+
+// 获取access_token的结构体
+type AccessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn int `json:"expires_in"`
+}
+// 错误结构体
+type AccessTokenErrResponse struct {
+	Errcode int `json:"errcode"`
+	Errmsg string `json:"errmsg"`
+}
+
+// 获取用户基本信息结构体 相关介绍，请查看URL：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839
+type WechatUserinfo struct {
+	Subscribe int `json:"subscribe"`
+	Openid string `json:"openid"`
+	Nickname string `json:"nickname"`
+	Sex int `json:"sex"`
+	Language string `json:"language"`
+	City string `json:"city"`
+	Province string `json:"province"`
+	Country string `json:"country"`
+	Headimgurl string `json:"headimgurl"`
+	SubscribeTime int `json:"subscribe_time"`
+	Unionid string `json:"unionid"`
+	Remark string `json:"remark"`
+	Groupid int `json:"groupid"`
+	TagidList []int `json:"tagid_list"`
 }
 
 /******************************************
@@ -134,8 +176,9 @@ func (c *Wechat) AutoResponse() {
 //}
 func (c *Wechat) MakeVerifyQrCode(codePath, returnUrl, msg string) (string, error) {
 	encodedUrl := strings.ToLower(url.QueryEscape(returnUrl))
+	encodeMsg := strings.ToLower(url.QueryEscape(msg))
 	logs.Info("编码后的url是：",encodedUrl)
-	urlmsg := "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd328b9395790be6e&redirect_uri="+encodedUrl+"&response_type=code&scope=snsapi_userinfo&state="+msg+"#wechat_redirect"
+	urlmsg := "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+c.Appkey+"&redirect_uri="+encodedUrl+"&response_type=code&scope=snsapi_userinfo&state="+encodeMsg+"#wechat_redirect"
 	err := c.MakeQRCode(urlmsg,codePath)
 	if err != nil{
 		logs.Info("生成二维码时出错，请查看下面的错误内容")
@@ -144,7 +187,16 @@ func (c *Wechat) MakeVerifyQrCode(codePath, returnUrl, msg string) (string, erro
 	return codePath,nil
 }
 
-
+// 方法：获取用户基本信息
+/*
+*  传入参数：
+*  @Param:code Type:string Comment:通过微信登录来获得的code
+*  @Param: Type: Comment:
+*  @Param: Type: Comment:
+*  返回参数：
+*  @Param: Type: Comment:
+*  @Param: Type: Comment:
+*/
 func (c *Wechat) GetUserWechatInfo(withCode string) (WechatResponse,error) {
 	var wr WechatResponse
 	err := c.CheckConfigSet()
@@ -165,7 +217,78 @@ func (c *Wechat) GetUserWechatInfo(withCode string) (WechatResponse,error) {
 	return wr,nil
 }
 
+// 方法：获取微信公众号AccessToken
+/*
+*  传入参数：
+*  @Param:appkey Type:string Comment:就是腾讯的appid 请在结构体初始化的时候就直接赋值
+*  @Param:appsecret Type:string Comment:请在结构体初始化的时候就直接赋值
+*  返回参数：
+*  @Param: Type:string Comment:AccessToken
+*  @Param: Type:string Comment:错误
+*/
+func (c *Wechat) GetAccessToken() (string,error) {
 
+	requestUrl := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+c.Appkey+"&secret="+c.AppSecret
+	r := go_requests.Requests{}
+	theio,err := r.Get(requestUrl,nil)
+	if err != nil{
+		fmt.Println(err)
+	}
+	theBody,err := ioutil.ReadAll(theio)
+	if err != nil{
+		fmt.Println(err)
+	}
+	theStr := string(theBody)
+	if strings.Contains(theStr,"errcode"){
+		fmt.Println("错了")
+		var acerr AccessTokenErrResponse
+		json.Unmarshal([]byte(theStr),&acerr)
+		return "",errors.New(acerr.Errmsg)
+	}else {
+		fmt.Println("没错")
+		var ac AccessTokenResponse
+		json.Unmarshal([]byte(theStr),&ac)
+		return ac.AccessToken,nil
+	}
+}
+
+
+
+// 方法：检查用户是否订阅
+/*
+*  传入参数：
+*  @Param:openid Type:string Comment:
+*  @Param:access_token Type:string Comment:注意该access_token 不是网页授权登录的access_token,而是微信公众号接口全局唯一凭证
+*  返回参数：
+*  @Param: Type: Comment:
+*  @Param: Type: Comment:
+*/
+func (c *Wechat) IsSubscribe(openid,access_token string) (bool, error) {
+	requestUrl := "https://api.weixin.qq.com/cgi-bin/user/info?access_token="+access_token+"&openid="+openid+"&lang=zh_CN "
+	r := go_requests.Requests{}
+	theio,err := r.Get(requestUrl,nil)
+	if err != nil{
+		return false,err
+	}
+	theBody,err := ioutil.ReadAll(theio)
+	if err != nil {
+		return false,err
+	}
+	if strings.Contains(string(theBody),"errcode"){
+		var err WechatErrMsg
+		json.Unmarshal(theBody,&err)
+		return false,errors.New(err.Errmsg)
+	}else {
+		var accessToken WechatUserinfo
+		json.Unmarshal(theBody,&accessToken)
+		if accessToken.Subscribe == 1 {
+			return true,nil
+		}else {
+			return false,nil
+		}
+	}
+
+}
 
 
 

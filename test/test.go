@@ -4,22 +4,10 @@ import (
 	"utility"
 	"fmt"
 	"strings"
+	"net/url"
 )
 
 func main()  {
-
-
-
-	//for {
-	//	fmt.Println(utility.RandVerifyCode(5))
-	//}
-
-
-	//fmt.Println(utility.GetCurrentDirectory())
-	//v  := utility.Validator{}
-	//v.IDMustBePositiveInteger(-1)
-	//fmt.Println(v.Status)
-	//fmt.Println(v.ErrMsg)
 
 
 	// 短信发送在这里
@@ -36,7 +24,26 @@ func main()  {
 
 	//fmt.Println(utility.IsRelativePath("2333"))
 
-	fmt.Println(36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36)
+	//fmt.Println(36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36*36)
+	//fmt.Println(UrlEncodeString("fileid=1"))
+	//WeChatAccessToken()
+	//fmt.Println(utility.GetTimestamp())
+	//fmt.Println(utility.CompareTimestampNow(1406418130))
+
+	//fmt.Println(utility.RandStr(15))
+	//fmt.Println(utility.CompareStrToSaltEncryptedStr("face4337197","cc6c3060b062b59d2df8d3cb382069f0x5dy"))
+
+
+	//fmt.Println(utility.Today())
+	//t,_ := utility.TransferDateFromStringToTime("2017年10月12日 下午2点20")
+	//tm := utility.TimeToTimestamp(t)
+	//fmt.Println(utility.CompareTimestampNow(tm))
+	//var t2 time.Time
+	//var t3 time.Time
+	//fmt.Println(t2)
+	//fmt.Println(t2 == t3)
+	//fmt.Println(utility.TransferDateFromStringToTime("2017-10-13 13:38"))
+	fmt.Println(utility.TimeNowForSecond())
 }
 
 // 发送短信 模板，由于重写了方法，所以方法的使用有点类似JS的链式写法。
@@ -73,4 +80,25 @@ func MakrRandUserkey() {
 		fmt.Println(utility.RandVerifyCode(6))
 	}
 	//fmt.Println(utility.MakeUserkey())
+}
+
+func UrlEncodeString(theStr string) string {
+	return url.QueryEscape(theStr)
+}
+
+func WeChatAccessToken() {
+	wc := utility.Wechat{
+		Appkey:"",
+		AppSecret:"",
+	}
+	ac,err := wc.GetAccessToken()
+	if err != nil{
+		fmt.Println(err)
+	}
+	fmt.Println(ac)
+	stat,err := wc.IsSubscribe("",ac)
+	if err != nil{
+		fmt.Println(err)
+	}
+	fmt.Println(stat)
 }

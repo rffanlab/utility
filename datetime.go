@@ -35,3 +35,7 @@ func Day() string {
 func Today() string {
 	return fmt.Sprintf("%s_%s_%s",Year(),Month(),Day())
 }
+
+
+
+
