@@ -14,11 +14,12 @@ import (
 	"io"
 	"strings"
 	"fmt"
-	"go-requests"
+	"utility/request"
 	"io/ioutil"
 	"encoding/json"
 	"errors"
 	"net/url"
+	"go-requests"
 )
 
 type Wechat struct {
@@ -204,7 +205,7 @@ func (c *Wechat) GetUserWechatInfo(withCode string) (WechatResponse,error) {
 		return wr,err
 	}
 	getAccess_tokenUrl := "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+c.Appkey+"&secret="+c.AppSecret+"&code="+ withCode + "&grant_type=authorization_code"
-	r := go_requests.Requests{}
+	r := request.Requests{}
 	theio,err := r.Get(getAccess_tokenUrl,nil)
 	if err != nil{
 		return wr,err
