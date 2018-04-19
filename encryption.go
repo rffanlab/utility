@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"github.com/pkg/errors"
 	"time"
+	"encoding/base64"
 )
 /******************************************
 *             加密方法包                  *
@@ -118,3 +119,54 @@ func CompareStrToSaltEncryptedStr(strToCompare, encryptedStr string) (bool,error
 	}
 }
 
+
+
+// 方法：Base64加密
+/*
+*  传入参数：
+*  @Param:str Type:string Comment:需要加密的字符串
+*  返回参数：
+*  @Param:encoded Type:string Comment:加密完成的字符串
+*/
+func  Base64Encode(str string) (encoded string) {
+	encoded = base64.StdEncoding.EncodeToString([]byte(str))
+	return
+}
+
+// 方法：Base64解密
+/*
+*  传入参数：
+*  @Param:str Type:string Comment:已经由base64加密的字符串
+*  返回参数：
+*  @Param:decoded Type:string Comment:解密好的字符串 如果解密出错则返回空字符串""
+*  @Param:err Type:error Comment:解密失败的错误
+*/
+func Base64Decode(str string) (decoded string,err error)  {
+	decodedStr,err := base64.StdEncoding.DecodeString(str)
+	if err != nil{
+		return "",err
+	}
+	decoded = string(decodedStr)
+	return
+}
+
+/******************************************
+*             AES加密方法                  *
+*                                         *
+*******************************************/
+
+func AESEncryption(source, key string) (res string) {
+
+	return
+}
+
+func AESDecryption(key string) (source string) {
+
+	return
+}
+
+
+/******************************************
+*             结束AES加密算法               *
+*                                         *
+*******************************************/

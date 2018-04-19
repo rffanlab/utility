@@ -10,6 +10,7 @@ import (
 	"math"
 	"crypto/md5"
 	"encoding/hex"
+	"strings"
 )
 
 const FILECHUNK  = 8192
@@ -166,6 +167,33 @@ func Filemd5(theFilePath string) (themd5 string, err error) {
 	return
 }
 
+// 方法：小文档sha1
+/*
+*  传入参数：
+*  @Param:theFilePath Type:string Comment:传入文档路径
+*  返回参数：
+*  @Param:themd5 Type:string Comment:md5返回值
+*  @Param:err Type:error Comment:错误
+*/
+func FileSha1(theFilePath string) (thesha1 string, err error) {
+
+	return
+}
+
+// 方法：大文档md5
+/*
+*  传入参数：
+*  @Param:theFilePath Type:string Comment:传入文档路径
+*  返回参数：
+*  @Param:themd5 Type:string Comment:md5返回值
+*  @Param:err Type:error Comment:错误
+*/
+func LargeFileSha1(theFilePath string) (thesha1 string, err error) {
+
+	return
+}
+
+
 // 方法：创建空文档
 /*
 *  传入参数：
@@ -183,3 +211,22 @@ func Touch(theFilePath string) (stat bool,err error) {
 	stat = true
 	return
 }
+
+func GetFileSuffix(filepath string) (suffix,body string) {
+	// 由于split出来的不可能小于1 所以就不判断小1的情况了。
+	strs := strings.Split(filepath,".")
+	if len(strs) == 1 {
+		return "",filepath
+	}else {
+		tmpstr := ""
+		for i := 0;i <len(strs) -1 ;i ++ {
+			tmpstr = tmpstr + strs[i]
+		}
+		return strs[1],tmpstr
+	}
+}
+
+
+
+
+

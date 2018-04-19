@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"net/url"
+	"io/ioutil"
 )
 
 func main()  {
@@ -43,7 +44,21 @@ func main()  {
 	//fmt.Println(t2)
 	//fmt.Println(t2 == t3)
 	//fmt.Println(utility.TransferDateFromStringToTime("2017-10-13 13:38"))
-	fmt.Println(utility.TimeNowForSecond())
+	//fmt.Println(utility.TimeNowForSecond())
+
+
+	ipinfo,err := utility.GetIPinfo("158.69.251.119")
+	if err != nil{
+		fmt.Println(err)
+	}
+	fmt.Println(ipinfo)
+	dirs,err := ioutil.ReadDir("D:/codes/gopath/src/utility/")
+	if err != nil{
+		fmt.Println(err)
+	}
+	for _,v := range dirs{
+		fmt.Println(v.Name())
+	}
 }
 
 // 发送短信 模板，由于重写了方法，所以方法的使用有点类似JS的链式写法。
