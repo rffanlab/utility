@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/url"
-	"go-requests"
 )
 
 type Wechat struct {
@@ -266,7 +265,7 @@ func (c *Wechat) GetAccessToken() (string,error) {
 */
 func (c *Wechat) IsSubscribe(openid,access_token string) (bool, error) {
 	requestUrl := "https://api.weixin.qq.com/cgi-bin/user/info?access_token="+access_token+"&openid="+openid+"&lang=zh_CN "
-	r := go_requests.Requests{}
+	r := request.Requests{}
 	theio,err := r.Get(requestUrl,nil)
 	if err != nil{
 		return false,err
