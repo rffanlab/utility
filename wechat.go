@@ -230,7 +230,7 @@ func (c *Wechat) GetUserWechatInfo(withCode string) (WechatResponse,error) {
 func (c *Wechat) GetAccessToken() (string,error) {
 
 	requestUrl := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+c.Appkey+"&secret="+c.AppSecret
-	r := go_requests.Requests{}
+	r := request.Requests{}
 	theio,err := r.Get(requestUrl,nil)
 	if err != nil{
 		fmt.Println(err)
