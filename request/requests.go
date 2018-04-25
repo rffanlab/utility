@@ -13,12 +13,17 @@ type Requests struct {
 	Url string
 	UserAgent string 
 	StatusCode int
+	Headers map[string]string
 }
 
 
 //
 func (c *Requests)SetUserAgent(useragent string) {
 	c.UserAgent = useragent
+}
+
+func (c *Requests)setHeaders(headerParams map[string]string )  {
+	c.Headers = headerParams
 }
 
 // 传入参数：params 必须是string的map
@@ -49,8 +54,17 @@ func (c *Requests)Get(theUrl string,params map[string]string) (io.Reader,error) 
 	if c.UserAgent != ""{
 		req.Header.Set("User-Agent",c.UserAgent)
 	}else{
-		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")	
+		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
 	}
+
+	if c.Headers != nil {
+		for key,value := range c.Headers {
+			req.Header.Set(key,value)
+		}
+	}
+
+
+
 	resp,err := client.Do(req)
 	if err != nil{
 		return nil,err
@@ -92,6 +106,12 @@ func (c *Requests)Post(theUrl string,params map[string]string) (io.Reader,error)
 	}else{
 		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")	
 	}
+	if c.Headers != nil {
+		for key,value := range c.Headers {
+			req.Header.Set(key,value)
+		}
+	}
+
 	resp,err := client.Do(req)
 	if err != nil{
 		return nil,err
