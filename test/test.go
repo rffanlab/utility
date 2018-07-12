@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"net/url"
-	"io/ioutil"
+	"utility/python"
 )
 
 func main()  {
@@ -47,18 +47,42 @@ func main()  {
 	//fmt.Println(utility.TimeNowForSecond())
 
 
-	ipinfo,err := utility.GetIPinfo("158.69.251.119")
-	if err != nil{
+	//ipinfo,err := utility.GetIPinfo("158.69.251.119")
+	//if err != nil{
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(ipinfo)
+	//dirs,err := ioutil.ReadDir("D:/codes/gopath/src/utility/")
+	//if err != nil{
+	//	fmt.Println(err)
+	//}
+	//for _,v := range dirs{
+	//	fmt.Println(v.Name())
+	//}
+
+
+	// 开始做获取Nginx的最新稳定版本的配置
+	//nginx := nginx2.Nginx{}
+	//fmt.Println(nginx.GetDownloadLink())
+	//downloadLink := nginx.GetDownloadLink()
+	//d := downloader.Downloader{
+	//	TargetUrl:downloadLink,
+	//}
+	//d.LiteDown()
+
+
+	// 开始Python相关工具的测试
+	pythonHelper := python.Python{}
+	linklist,err := pythonHelper.GetVersionList()
+	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(ipinfo)
-	dirs,err := ioutil.ReadDir("D:/codes/gopath/src/utility/")
-	if err != nil{
-		fmt.Println(err)
+	for _,value := range linklist{
+		fmt.Println(pythonHelper.MakeDownloadLinkByVer(value))
 	}
-	for _,v := range dirs{
-		fmt.Println(v.Name())
-	}
+
+
+
 }
 
 // 发送短信 模板，由于重写了方法，所以方法的使用有点类似JS的链式写法。

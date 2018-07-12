@@ -7,3 +7,4 @@ go get -u github.com/pkg/sftp
 go get -u github.com/pkg/errors   
 go get -u github.com/astaxie/beego/logs  
 go get -u github.com/boombuler/barcode  
+go get -u github.com/PuerkitoBio/goquery  

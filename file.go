@@ -226,6 +226,15 @@ func GetFileSuffix(filepath string) (suffix,body string) {
 	}
 }
 
+// 文件是否存在
+func Exist(path string) bool {
+	if _, err := os.Stat("/path/to/whatever"); os.IsNotExist(err) {
+		// path/to/whatever does not exist
+		return false;
+	}
+	return true
+	
+}
 
 
 
