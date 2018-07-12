@@ -29,6 +29,9 @@ func (c *Requests)setHeaders(headerParams map[string]string )  {
 // 传入参数：params 必须是string的map
 
 func (c *Requests)Get(theUrl string,params map[string]string) (io.Reader,error) {
+	if theUrl == "" {
+		theUrl = c.Url
+	}
 	tr := &http.Transport{
 		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
 	}

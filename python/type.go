@@ -34,6 +34,17 @@ func (c *Python)GetVersionList() (versions []string,err error) {
 				strs := strings.Split(ver," ")
 				if len(strs)>0 {
 					str := strings.TrimSpace(strs[1])
+					if strings.HasSuffix(str,".0") {
+						newStr := ""
+						theStrs := strings.Split(str,".")
+						for i:=0;i<(len(theStrs)-1) ;i++  {
+							if i == 0 {
+								newStr = theStrs[i]
+							}else  {
+								newStr = newStr+"."+theStrs[i]
+							}
+						}
+					}
 					versions = append(versions, str)
 				}
 			})
