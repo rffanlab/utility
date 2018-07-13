@@ -4,3 +4,5 @@ store/
 *.exe*
 testfile
 tmp/
+test/test.ext
+test/testfile
