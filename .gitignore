@@ -2,5 +2,5 @@
 store/
 *.log
 *.exe*
-
+testfile
 tmp/

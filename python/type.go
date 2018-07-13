@@ -6,6 +6,7 @@ import (
 		"strings"
 	"fmt"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 type Python struct {
@@ -37,12 +38,34 @@ func (c *Python)GetVersionList() (versions []string,err error) {
 					if strings.HasSuffix(str,".0") {
 						newStr := ""
 						theStrs := strings.Split(str,".")
-						for i:=0;i<(len(theStrs)-1) ;i++  {
-							if i == 0 {
-								newStr = theStrs[i]
-							}else  {
-								newStr = newStr+"."+theStrs[i]
+						// 开始判断版本
+						bigVersion,err := strconv.Atoi(theStrs[0])
+						if err != nil{
+							return
+						}
+						secondVersion,err := strconv.Atoi(theStrs[1])
+						if err != nil {
+							return
+						}
+						if bigVersion<3  {
+							for i:=0;i<(len(theStrs)-1) ;i++  {
+								if i == 0 {
+									newStr = theStrs[i]
+								}else  {
+									newStr = newStr+"."+theStrs[i]
+								}
 							}
+							str = newStr
+						}
+						if  bigVersion>=3 && secondVersion<=2{
+							for i:=0;i<(len(theStrs)-1) ;i++  {
+								if i == 0 {
+									newStr = theStrs[i]
+								}else  {
+									newStr = newStr+"."+theStrs[i]
+								}
+							}
+							str = newStr
 						}
 					}
 					versions = append(versions, str)

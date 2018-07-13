@@ -11,6 +11,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"strings"
+	"fmt"
+	"path"
 )
 
 const FILECHUNK  = 8192
@@ -115,6 +117,26 @@ func ReadLines(path string) (lines []string, err error) {
 	}
 	return
 }
+
+func AppendLine(line string,filePath string) error  {
+	if strings.HasPrefix(filePath,"./") || strings.HasPrefix(filePath,".\\") {
+		dir := GetCurrentDirectory()
+		filePath = path.Join(dir,filePath)
+	}
+	if !Exist(filePath) {
+		fmt.Errorf("文件不存在，创建文件中")
+		Touch(filePath)
+	}
+	fp,err := os.OpenFile(filePath,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644)
+	if err != nil {
+		return err
+	}
+	buf := []byte(line)
+	fp.Write(buf)
+	fp.Close()
+	return nil
+}
+
 
 
 // 方法：大文档md5
@@ -228,8 +250,9 @@ func GetFileSuffix(filepath string) (suffix,body string) {
 
 // 文件是否存在
 func Exist(path string) bool {
-	if _, err := os.Stat("/path/to/whatever"); os.IsNotExist(err) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		// path/to/whatever does not exist
+		fmt.Println(err)
 		return false;
 	}
 	return true

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 	"net/url"
-	"utility/python"
 )
 
 func main()  {
@@ -72,15 +71,19 @@ func main()  {
 
 
 	// 开始Python相关工具的测试
-	pythonHelper := python.Python{}
-	linklist,err := pythonHelper.GetVersionList()
-	if err != nil {
+	//pythonHelper := python.Python{}
+	//linklist,err := pythonHelper.GetVersionList()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//for _,value := range linklist{
+	//	fmt.Println(pythonHelper.MakeDownloadLinkByVer(value))
+	//}
+
+	err := utility.AppendLine("\n23333","./testfile")
+	if err != nil{
 		fmt.Println(err)
 	}
-	for _,value := range linklist{
-		fmt.Println(pythonHelper.MakeDownloadLinkByVer(value))
-	}
-
 
 
 }
