@@ -1,4 +1,4 @@
-package utility
+package common
 
 // 写于 2017-09-26 预计半年内是生效的。
 

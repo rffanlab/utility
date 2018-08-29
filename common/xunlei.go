@@ -1,4 +1,4 @@
-package utility
+package common
 
 const (
 	SHUIJIN_API string = "1-api-red.xunlei.com"

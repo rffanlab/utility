@@ -7,12 +7,14 @@ import (
 	"net/url"
 	"io"
 	"strings"
+	"golang.org/x/net/proxy"
 )
 
 type Requests struct {
 	Url string
 	UserAgent string 
 	StatusCode int
+	Proxy string
 	Headers map[string]string
 }
 
@@ -32,8 +34,21 @@ func (c *Requests)Get(theUrl string,params map[string]string) (io.Reader,error) 
 	if theUrl == "" {
 		theUrl = c.Url
 	}
-	tr := &http.Transport{
-		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+	var tr *http.Transport
+	if c.Proxy != "" {
+		dialSocksProxy, err := proxy.SOCKS5("tcp", "127.0.0.1:1080", nil, proxy.Direct)
+		if err != nil {
+			fmt.Println("Error connecting to proxy:", err)
+		}
+		fmt.Println("已经过了检测了")
+		tr = &http.Transport{
+			Dial: dialSocksProxy.Dial,
+			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+		}
+	}else {
+		tr = &http.Transport{
+			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+		}
 	}
 	client := &http.Client{Transport:tr}
 	realUrl := ""
@@ -57,7 +72,7 @@ func (c *Requests)Get(theUrl string,params map[string]string) (io.Reader,error) 
 	if c.UserAgent != ""{
 		req.Header.Set("User-Agent",c.UserAgent)
 	}else{
-		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
+		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
 	}
 
 	if c.Headers != nil {
@@ -85,8 +100,18 @@ func (c *Requests)Get(theUrl string,params map[string]string) (io.Reader,error) 
 *  返回参数：io.Reader,错误
 */
 func (c *Requests)Post(theUrl string,params map[string]string) (io.Reader,error) {
-	tr := &http.Transport{
-		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+	var tr *http.Transport
+	if c.Proxy != "" {
+		tr = &http.Transport{
+			Proxy: func(request *http.Request) (*url.URL, error) {
+				return url.Parse(c.Proxy)
+			},
+			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+		}
+	}else {
+		tr = &http.Transport{
+			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+		}
 	}
 	client := &http.Client{Transport:tr}
 	var body io.Reader
@@ -107,7 +132,7 @@ func (c *Requests)Post(theUrl string,params map[string]string) (io.Reader,error)
 	if c.UserAgent != ""{
 		req.Header.Set("User-Agent",c.UserAgent)
 	}else{
-		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")	
+		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
 	}
 	if c.Headers != nil {
 		for key,value := range c.Headers {
@@ -143,3 +168,6 @@ func (c *Requests)SetStatusCode(statusCode int)  {
 	c.StatusCode = statusCode
 }
 
+func (c *Requests) Download() {
+
+}

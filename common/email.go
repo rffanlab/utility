@@ -1,4 +1,4 @@
-package utility
+package common
 
 type SendEmail struct {
 	User string
