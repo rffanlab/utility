@@ -1,7 +1,6 @@
 package system
 
 import (
-	"fmt"
 	"runtime"
 	"strings"
 	"utility/common"
@@ -13,6 +12,9 @@ linux
 darwin 苹果
  */
 
+ /**
+ 系统类型
+  */
 type OSType struct {
 	Type string
 	Version string
@@ -20,8 +22,12 @@ type OSType struct {
 	Arch string
 }
 
+/**
+解析LinuxRelease文件
+ */
 func ParseOSRealeaseFile()(map[string]string,error)  {
 	var params map[string]string
+	params = make(map[string]string)
 	lines,err :=common.ReadLines("/etc/os-release")
 	if err != nil {
 		return nil,err
@@ -36,6 +42,12 @@ func ParseOSRealeaseFile()(map[string]string,error)  {
 }
 
 
+/**
+检测系统类型
+目前Windows只能检测到是window不能检测更深入的版本，例如win7 win10等
+Linux能够检测到发行版本，原理是通过Linux的os-release文件来进行确认的。
+macos没办法确认
+ */
 func DetectOSType() (OSType,error) {
 	var ostype OSType
 	ostype.Arch = runtime.GOARCH
@@ -48,15 +60,12 @@ func DetectOSType() (OSType,error) {
 		ostype.Distribution = strings.Replace(params["ID"],"\"","",-1)
 		ostype.Version = strings.Replace(params["VERSION_ID"],"\"","\"",-1)
 	}
-
-
-fmt.Println(runtime.GOARCH)
-	fmt.Println(runtime.GOOS)
-
-
 	return ostype,nil
 }
 
+/**
+获取系统线程数量
+ */
 func GetThreadNum() int {
 	return runtime.NumCPU()
 }
