@@ -38,21 +38,27 @@ func (c *Downloader) LiteDown() {
 	io.Copy(f, res.Body)
 }
 
+//
 func (c *Downloader)FullDownlod() error {
 	tr := &http.Transport{
 		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
 	}
-	req,err := http.NewRequest("HEAD",c.TargetUrl,nil)
-	if err != nil {
-		return err
-	}
+	//req,err := http.NewRequest("HEAD",c.TargetUrl,nil)
+	//if err != nil {
+	//	return err
+	//}
+	//if c.Cookie != "" {
+	//	req.Header.Set("Cookie",c.Cookie)
+	//	req.Header.Set("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36")
+	//}
 	client:=&http.Client{Transport:tr}
-	resp,err := client.Do(req)
-	if err != nil {
-		return  err
-	}
-	fmt.Println(resp.ContentLength)
-	acceptRange := resp.Header.Get("Accept-Ranges")
+	//resp,err := client.Do(req)
+	//if err != nil {
+	//	return  err
+	//}
+	//fmt.Println(resp.ContentLength)
+	//acceptRange := resp.Header.Get("Accept-Ranges")
+	acceptRange :=""
 	var save string
 	if c.SavePath != "" {
 		save = path.Join(c.SavePath,path.Base(c.TargetUrl))
