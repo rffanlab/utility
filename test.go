@@ -1,6 +1,10 @@
 package main
 
-import "utility/system"
+import (
+	"github.com/astaxie/beego/logs"
+	"utility/command"
+	"utility/system"
+)
 
 func main() {
 	//d := downloader.Downloader{}
@@ -12,4 +16,10 @@ func main() {
 	system.IsWindows()
 	system.IsLinux()
 	system.IsMacos()
+	result,err := command.RunCmd("netstat","-ntl","|","grep","80")
+	if err != nil{
+		logs.Error(err)
+	}
+	logs.Info(result)
+
 }
