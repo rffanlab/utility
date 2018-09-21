@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 	"utility/common"
@@ -68,6 +69,42 @@ func DetectOSType() (OSType,error) {
  */
 func GetThreadNum() int {
 	return runtime.NumCPU()
+}
+
+func IsWindows() bool {
+	ostype,err:= DetectOSType()
+	if err != nil {
+		return false
+	}
+	fmt.Print(ostype.Type)
+	if ostype.Type == "windows" {
+		return true
+	}
+	return false
+}
+
+func IsLinux() bool {
+	ostype,err:= DetectOSType()
+	if err != nil {
+		return false
+	}
+	fmt.Print(ostype.Type)
+	if ostype.Type == "linux" {
+		return true
+	}
+	return false
+}
+
+func IsMacos() bool {
+	ostype,err:= DetectOSType()
+	if err != nil {
+		return false
+	}
+	fmt.Print(ostype.Type)
+	if ostype.Type == "darwin" {
+		return true
+	}
+	return false
 }
 
 
