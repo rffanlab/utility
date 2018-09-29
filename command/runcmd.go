@@ -26,7 +26,6 @@ func RunCmd(theCmd string, args ...string) (out string,err error) {
 	if err != nil {
 		logs.Error(err)
 	}
-	logs.Info(string(opBytes))
 	out = string(opBytes)
 	return
 }

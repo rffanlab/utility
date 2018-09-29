@@ -16,7 +16,7 @@ func main() {
 	system.IsWindows()
 	system.IsLinux()
 	system.IsMacos()
-	result,err := command.RunCmd("netstat","-ntl","|","grep","80")
+	result,err := command.RunCmd("netstat","-ntl")
 	if err != nil{
 		logs.Error(err)
 	}
