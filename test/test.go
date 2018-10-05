@@ -1,7 +1,9 @@
 package main
 
 import (
-	"utility"
+	"timer/utility"
+	"utility/system"
+
 	"fmt"
 	"strings"
 	"net/url"
@@ -80,10 +82,11 @@ func main()  {
 	//	fmt.Println(pythonHelper.MakeDownloadLinkByVer(value))
 	//}
 
-	err := utility.AppendLine("\n23333","./testfile")
-	if err != nil{
-		fmt.Println(err)
-	}
+	//err := utility.AppendLine("\n23333","./testfile")
+	//if err != nil{
+	//	fmt.Println(err)
+	//}
+	system.Ping("192.168.1.1")
 
 
 }
