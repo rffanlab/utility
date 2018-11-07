@@ -1,6 +1,7 @@
 package main
 
 import (
+	"time"
 	"timer/utility"
 	"utility/system"
 
@@ -86,7 +87,11 @@ func main()  {
 	//if err != nil{
 	//	fmt.Println(err)
 	//}
-	system.Ping("192.168.1.1")
+	for i:=0;i<4;i++{
+		system.Ping("www.163.com")
+		time.Sleep(time.Duration(2)*time.Second)
+	}
+
 
 
 }
@@ -109,7 +114,7 @@ func SendSMSExample() {
 	fmt.Println(result)
 	if _,ok := result["error_response"];ok{
 		if str,ok := result["error_response"].(string);ok{
-			if strings.Contains(str,"出发业务流控"){
+			if strings.Contains(str,"触发业务流控"){
 				fmt.Println(str)
 			}else {
 				fmt.Println(str)

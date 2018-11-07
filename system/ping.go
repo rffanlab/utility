@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"net"
+	"time"
 )
 
 type ICMP struct {
@@ -40,6 +41,7 @@ func Ping(ip string)  {
 		icmp ICMP
 		buffer bytes.Buffer
 	)
+	t1 := time.Now()
 	conn,err := net.Dial("ip4:icmp",ip)
 	if err != nil {
 		logs.Error(err)
@@ -59,7 +61,8 @@ func Ping(ip string)  {
 		logs.Error(err)
 		return
 	}
-	fmt.Println("ping成功")
+	cacl := time.Since(t1)
+	fmt.Println("ping成功,耗时:",cacl)
 
 
 }
