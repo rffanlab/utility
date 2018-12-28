@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/astaxie/beego/logs"
-	"utility/command"
-	"utility/system"
+	"fmt"
+	"utility/encryption"
 )
 
 func main() {
@@ -13,13 +12,19 @@ func main() {
 	//d.Cookie = "oraclelicense=accept-securebackup-cookie"
 	//d.FullDownlod()
 	//system.DetectOSType()
-	system.IsWindows()
-	system.IsLinux()
-	system.IsMacos()
-	result,err := command.RunCmd("netstat","-ntl")
-	if err != nil{
-		logs.Error(err)
-	}
-	logs.Info(result)
+	//system.IsWindows()
+	//system.IsLinux()
+	//system.IsMacos()
+	//result,err := command.RunCmd("netstat","-ntl")
+	//if err != nil{
+	//	logs.Error(err)
+	//}
+	//logs.Info(result)
+	var params map[string]string
+	params = make(map[string]string)
+	params["23333"] = "42njoahufd"
+	params["nowbnfewn"] = "23ui098hinfan"
+	formatedStr, _ := encryption.FormatParams(params, "&")
+	fmt.Println(formatedStr)
 
 }
