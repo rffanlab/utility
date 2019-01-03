@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"utility/encryption"
+	"utility/img"
 )
 
 func main() {
@@ -20,11 +19,13 @@ func main() {
 	//	logs.Error(err)
 	//}
 	//logs.Info(result)
-	var params map[string]string
-	params = make(map[string]string)
-	params["23333"] = "42njoahufd"
-	params["nowbnfewn"] = "23ui098hinfan"
-	formatedStr, _ := encryption.FormatParams(params, "&")
-	fmt.Println(formatedStr)
+	//sx,sy := robotgo.GetScreenSize()
+	//robotgo.SaveCapture("F:/tmp/screen.png",0,0,sx,sy)
+	_, _, _ = img.ReadImg("F:/tmp/screen.png")
+	//for k,v := range samePiexl{
+	//	fmt.Println("2333")
+	//	fmt.Println(k)
+	//	fmt.Println(v)
+	//}
 
 }
