@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"utility/common"
+	"utility/common/stringutil"
 	"utility/img"
 )
 
@@ -27,5 +30,8 @@ func main() {
 	//	fmt.Println(k)
 	//	fmt.Println(v)
 	//}
-
+	stat, _ := stringutil.IsDomain("")
+	isip := common.IsIPv4("90.11.99.27")
+	fmt.Println(stat)
+	fmt.Println(isip)
 }
