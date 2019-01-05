@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"strings"
+	"utility/command"
 	"utility/common"
 	"utility/common/stringutil"
 	"utility/img"
@@ -34,4 +36,16 @@ func main() {
 	isip := common.IsIPv4("90.11.99.27")
 	fmt.Println(stat)
 	fmt.Println(isip)
+	out, err := command.RunCmd("systemctl", "status", "sshd")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(out)
+	lines := strings.Split(out, "\n")
+	for _, line := range lines {
+		if strings.Contains(line, "active") {
+			fmt.Println(line)
+		}
+	}
+
 }
