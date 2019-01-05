@@ -119,6 +119,27 @@ func ReadLines(path string) (lines []string, err error) {
 	return
 }
 
+func WriteLines(lines []string, path string) (err error) {
+	var file *os.File
+
+	if file, err = os.Create(path); err != nil {
+		return
+	}
+
+	defer file.Close()
+
+	for _, elem := range lines {
+		_, err := file.WriteString(strings.TrimSpace(elem) + "\n")
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+	}
+	return
+
+	return
+}
+
 /**
 添加一行
 */
@@ -161,6 +182,23 @@ func FindNotAnnotatedLine(filepath, containStr, annotateMark string) (line strin
 				return
 			}
 		}
+	}
+	return
+}
+
+func AddAnnotatedForLine(filePath, containStr, annotateMark string) (stat bool, err error) {
+	lines, err := ReadLines(filePath)
+	if err != nil {
+		return
+	}
+	for _, v := range lines {
+		if strings.Contains(v, containStr) {
+			v = annotateMark + v
+		}
+	}
+	err = WriteLines(lines, filePath)
+	if err == nil {
+		stat = true
 	}
 	return
 }
