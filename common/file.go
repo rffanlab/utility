@@ -79,6 +79,11 @@ func ReadTextFile(srcPath string) string {
 	return string(buf)
 }
 
+func WriteFile(filePath, toWrite string) (err error) {
+	err = ioutil.WriteFile(filePath, []byte(toWrite), 0644)
+	return
+}
+
 // 方法：逐行读取文档
 /*
 *  传入参数：
