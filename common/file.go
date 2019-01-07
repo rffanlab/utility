@@ -196,9 +196,10 @@ func AddAnnotatedForLine(filePath, containStr, annotateMark string) (stat bool, 
 	if err != nil {
 		return
 	}
-	for _, v := range lines {
+	for i, v := range lines {
 		if strings.Contains(v, containStr) {
 			v = annotateMark + v
+			lines[i] = v
 		}
 	}
 	err = WriteLines(lines, filePath)
