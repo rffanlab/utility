@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"runtime"
 	"strings"
 	"utility/common"
@@ -11,68 +12,67 @@ import (
 windows
 linux
 darwin 苹果
- */
+*/
 
- /**
- 系统类型
-  */
+/**
+系统类型
+*/
 type OSType struct {
-	Type string
-	Version string
+	Type         string
+	Version      string
 	Distribution string
-	Arch string
+	Arch         string
 }
 
 /**
 解析LinuxRelease文件
- */
-func ParseOSRealeaseFile()(map[string]string,error)  {
+*/
+func ParseOSRealeaseFile() (map[string]string, error) {
 	var params map[string]string
 	params = make(map[string]string)
-	lines,err :=common.ReadLines("/etc/os-release")
+	lines, err := common.ReadLines("/etc/os-release")
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	for _,value := range  lines {
-		strs := strings.Split(value,"=")
-		if len(strs)>1 {
-			params[strs[0]]=strs[1]
+	for _, value := range lines {
+		strs := strings.Split(value, "=")
+		if len(strs) > 1 {
+			params[strs[0]] = strs[1]
 		}
 	}
-	return params,nil
+	return params, nil
 }
-
 
 /**
 检测系统类型
 目前Windows只能检测到是window不能检测更深入的版本，例如win7 win10等
 Linux能够检测到发行版本，原理是通过Linux的os-release文件来进行确认的。
 macos没办法确认
- */
-func DetectOSType() (OSType,error) {
+*/
+func DetectOSType() (OSType, error) {
 	var ostype OSType
 	ostype.Arch = runtime.GOARCH
 	ostype.Type = runtime.GOOS
-	if ostype.Type == "linux"{
-		params,err := ParseOSRealeaseFile()
+	if ostype.Type == "linux" {
+		params, err := ParseOSRealeaseFile()
 		if err != nil {
-			return ostype,err
+			return ostype, err
 		}
-		ostype.Distribution = strings.Replace(params["ID"],"\"","",-1)
-		ostype.Version = strings.Replace(params["VERSION_ID"],"\"","\"",-1)
+		ostype.Distribution = strings.Replace(params["ID"], "\"", "", -1)
+		ostype.Version = strings.Replace(params["VERSION_ID"], "\"", "\"", -1)
 	}
-	return ostype,nil
+	return ostype, nil
 }
 
 /**
 获取系统线程数量
- */
+*/
 func GetThreadNum() int {
 	return runtime.NumCPU()
 }
 
 func IsWindows() bool {
-	ostype,err:= DetectOSType()
+	ostype, err := DetectOSType()
 	if err != nil {
 		return false
 	}
@@ -84,7 +84,7 @@ func IsWindows() bool {
 }
 
 func IsLinux() bool {
-	ostype,err:= DetectOSType()
+	ostype, err := DetectOSType()
 	if err != nil {
 		return false
 	}
@@ -95,8 +95,52 @@ func IsLinux() bool {
 	return false
 }
 
+func IsUbuntu() bool {
+	ostype, err := DetectOSType()
+	if err != nil {
+		logs.Error(err)
+		return false
+	}
+	lowCaseVer := strings.ToLower(ostype.Distribution)
+	if strings.Contains(lowCaseVer, "ubuntu") {
+		return true
+	}
+	return false
+}
+
+func IsCentOS() bool {
+	ostype, err := DetectOSType()
+	if err != nil {
+		logs.Error(err)
+		return false
+	}
+	lowCaseVer := strings.ToLower(ostype.Distribution)
+	if strings.Contains(lowCaseVer, "centos") {
+		return true
+	}
+	return false
+}
+
+/**
+是否是CentOS7
+*/
+func IsCentOS7() bool {
+	ostype, err := DetectOSType()
+	if err != nil {
+		logs.Error(err)
+		return false
+	}
+	lowCaseVer := strings.ToLower(ostype.Distribution)
+	if strings.Contains(lowCaseVer, "centos") {
+		if strings.Contains(ostype.Version, "7") {
+			return true
+		}
+	}
+	return false
+}
+
 func IsMacos() bool {
-	ostype,err:= DetectOSType()
+	ostype, err := DetectOSType()
 	if err != nil {
 		return false
 	}
@@ -106,5 +150,3 @@ func IsMacos() bool {
 	}
 	return false
 }
-
-
