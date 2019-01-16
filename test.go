@@ -1,8 +1,14 @@
 package main
 
 import (
-	"utility/compress"
+	"fmt"
+	"utility/common"
 )
+
+type TestStruct struct {
+	Name  string `json:"name"`
+	Value int
+}
 
 func main() {
 	//d := downloader.Downloader{}
@@ -42,6 +48,22 @@ func main() {
 	//		fmt.Println(line)
 	//	}
 	//}
-	compress.DeCompress("/root/mysql-5.6.41.tar.gz", "/root/")
+	//compress.DeCompress("/root/mysql-5.6.41.tar.gz", "/root/")
+	//var params map[string]string
+	//params = make(map[string]string)
+	//params["abnudsonfwe"] = "23333"
+	//params["aadnaowenf"] = "43333"
+	//sign := encryption.Sign(params,"2333")
+	//fmt.Println(sign)
+	structT := TestStruct{
+		"你好",
+		233333,
+	}
+	mapT := common.ConvertStructToMapString(structT)
+	fmt.Println(mapT)
+	mapT2 := common.ConvertStructToMapStringWithTagName(structT, "json")
+	fmt.Println(mapT2)
+	fmt.Println(mapT["Value"])
+	fmt.Println(mapT2["Value"])
 
 }
