@@ -1,36 +1,37 @@
 package request
 
 import (
-	"net/http"
 	"crypto/tls"
 	"fmt"
-	"net/url"
-	"io"
-	"strings"
+	"github.com/astaxie/beego/logs"
 	"golang.org/x/net/proxy"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strings"
 )
 
 type Requests struct {
-	Url string
-	UserAgent string 
+	Url        string
+	UserAgent  string
 	StatusCode int
-	Proxy string
-	Headers map[string]string
+	Proxy      string
+	Headers    map[string]string
 }
 
-
 //
-func (c *Requests)SetUserAgent(useragent string) {
+func (c *Requests) SetUserAgent(useragent string) {
 	c.UserAgent = useragent
 }
 
-func (c *Requests)setHeaders(headerParams map[string]string )  {
+func (c *Requests) setHeaders(headerParams map[string]string) {
 	c.Headers = headerParams
 }
 
 // 传入参数：params 必须是string的map
 
-func (c *Requests)Get(theUrl string,params map[string]string) (io.Reader,error) {
+func (c *Requests) Get(theUrl string, params map[string]string) (io.Reader, error) {
 	if theUrl == "" {
 		theUrl = c.Url
 	}
@@ -42,129 +43,146 @@ func (c *Requests)Get(theUrl string,params map[string]string) (io.Reader,error) 
 		}
 		fmt.Println("已经过了检测了")
 		tr = &http.Transport{
-			Dial: dialSocksProxy.Dial,
-			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+			Dial:            dialSocksProxy.Dial,
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
-	}else {
+	} else {
 		tr = &http.Transport{
-			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
-	client := &http.Client{Transport:tr}
+	client := &http.Client{Transport: tr}
 	realUrl := ""
-	if params != nil{
+	if params != nil {
 		readerString := ""
-		for k,v := range params{
-			if readerString == ""{
-				readerString = fmt.Sprintf("%s=%s",k,url.QueryEscape(v)) //进行URL编码的参数
-			}else {
-				readerString = fmt.Sprintf("%s&%s=%s",readerString,k,url.QueryEscape(v))
+		for k, v := range params {
+			if readerString == "" {
+				readerString = fmt.Sprintf("%s=%s", k, url.QueryEscape(v)) //进行URL编码的参数
+			} else {
+				readerString = fmt.Sprintf("%s&%s=%s", readerString, k, url.QueryEscape(v))
 			}
 		}
-		realUrl = fmt.Sprintf("%s?%s",theUrl,readerString)
-	}else {
+		realUrl = fmt.Sprintf("%s?%s", theUrl, readerString)
+	} else {
 		realUrl = theUrl
 	}
-	req,err := http.NewRequest("GET",realUrl,nil)
-	if err != nil{
-		return nil,err
+	req, err := http.NewRequest("GET", realUrl, nil)
+	if err != nil {
+		return nil, err
 	}
-	if c.UserAgent != ""{
-		req.Header.Set("User-Agent",c.UserAgent)
-	}else{
-		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
+	} else {
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
 	}
 
 	if c.Headers != nil {
-		for key,value := range c.Headers {
-			req.Header.Set(key,value)
+		for key, value := range c.Headers {
+			req.Header.Set(key, value)
 		}
 	}
 
-
-
-	resp,err := client.Do(req)
-	if err != nil{
-		return nil,err
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
 	}
 	// Update Struct 更新结构体
 	c.SetUrl(resp.Request.URL.String())
 	c.SetStatusCode(resp.StatusCode)
 
-	return resp.Body,nil
+	return resp.Body, nil
 }
 
 // Post 方法
 /*
 *  传入参数：theUrl 类型string，params 类型map key和value都是string
 *  返回参数：io.Reader,错误
-*/
-func (c *Requests)Post(theUrl string,params map[string]string) (io.Reader,error) {
+ */
+func (c *Requests) Post(theUrl string, params map[string]string) (io.Reader, error) {
+	logs.Info(params)
 	var tr *http.Transport
 	if c.Proxy != "" {
 		tr = &http.Transport{
 			Proxy: func(request *http.Request) (*url.URL, error) {
 				return url.Parse(c.Proxy)
 			},
-			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
-	}else {
+	} else {
 		tr = &http.Transport{
-			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
-	client := &http.Client{Transport:tr}
+	client := &http.Client{Transport: tr}
 	var body io.Reader
 	// 参数生成
-	if params != nil{
+	if params != nil {
 		values := url.Values{}
-		for k,v := range params{
-			values.Set(k,v)
+		for k, v := range params {
+			values.Set(k, v)
 		}
 		body = strings.NewReader(values.Encode())
-	}else {
+	} else {
 		body = nil
 	}
-	req,err := http.NewRequest("POST",theUrl,body)
-	if err != nil{
-		return nil,err
+	logs.Info(body)
+	req, err := http.NewRequest("POST", theUrl, body)
+	if err != nil {
+		return nil, err
 	}
-	if c.UserAgent != ""{
-		req.Header.Set("User-Agent",c.UserAgent)
-	}else{
-		req.Header.Set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
+	if c.UserAgent != "" {
+		req.Header.Set("User-Agent", c.UserAgent)
+	} else {
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
 	}
 	if c.Headers != nil {
-		for key,value := range c.Headers {
-			req.Header.Set(key,value)
+		for key, value := range c.Headers {
+			req.Header.Set(key, value)
 		}
 	}
 
-	resp,err := client.Do(req)
-	if err != nil{
-		return nil,err
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
 	}
 
 	// Update Struct 更新结构体
 	c.SetUrl(resp.Request.URL.String())
 	c.SetStatusCode(resp.StatusCode)
-	return resp.Body,nil
+	return resp.Body, nil
 }
 
+func (c *Requests) PostForm(theurl string, params map[string]string) (result string, err error) {
+	postParams := url.Values{}
+	for k, v := range params {
+		postParams.Set(k, v)
+	}
+	requestBody := strings.NewReader(postParams.Encode())
+	resp, err := http.Post(theurl, "application/x-www-form-urlencoded", requestBody)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	result = string(body)
+	return
+}
 
 // Setter
 /*
 * 设置结构体的Url
 *
-*/
-func (c *Requests)SetUrl(theUrl string)  {
+ */
+func (c *Requests) SetUrl(theUrl string) {
 	c.Url = theUrl
 }
+
 /*  设置结构体的状态码
 *   传入参数：状态码，类型int
 *   返回参数：无
-*/
-func (c *Requests)SetStatusCode(statusCode int)  {
+ */
+func (c *Requests) SetStatusCode(statusCode int) {
 	c.StatusCode = statusCode
 }
 
