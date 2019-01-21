@@ -1,14 +1,18 @@
 package request
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"golang.org/x/net/proxy"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -153,19 +157,99 @@ func (c *Requests) Post(theUrl string, params map[string]string) (io.Reader, err
 }
 
 func (c *Requests) PostForm(theurl string, params map[string]string) (result string, err error) {
+	var tr *http.Transport
+	if c.Proxy != "" {
+		logs.Info("有代理")
+		tr = &http.Transport{
+			Proxy: func(request *http.Request) (*url.URL, error) {
+				return url.Parse(c.Proxy)
+			},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
+	client := &http.Client{Transport: tr}
+
 	postParams := url.Values{}
 	for k, v := range params {
 		postParams.Set(k, v)
 	}
 	requestBody := strings.NewReader(postParams.Encode())
-	resp, err := http.Post(theurl, "application/x-www-form-urlencoded", requestBody)
+	//resp, err := http.Post(theurl, "application/x-www-form-urlencoded", requestBody)
+	request, err := http.NewRequest("POST", theurl, requestBody)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := client.Do(request)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	result = string(body)
+	return
+}
+
+func (c *Requests) PostMultiPart(theurl string, params map[string]string, paramName, filePath string) (result string, err error) {
+	var tr *http.Transport
+	if c.Proxy != "" {
+		logs.Info("有代理")
+		tr = &http.Transport{
+			Proxy: func(request *http.Request) (*url.URL, error) {
+				return url.Parse(c.Proxy)
+			},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
+	client := &http.Client{Transport: tr}
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	defer file.Close()
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, filepath.Base(filePath))
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	_, err = io.Copy(part, file)
+	for key, val := range params {
+		_ = writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	request, err := http.NewRequest("POST", theurl, body)
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	resp, err := client.Do(request)
 	if err != nil {
 		logs.Error(err)
 		return
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	result = string(body)
+	resultBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	result = string(resultBody)
+
 	return
 }
 
