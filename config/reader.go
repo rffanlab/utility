@@ -4,32 +4,44 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"strings"
 	"utility/common"
 )
 
 func ReadConfig(filePath string) (params map[string]interface{}, err error) {
+	params = make(map[string]interface{})
 	if common.Exist(filePath) {
 		suffix, _ := common.GetFileSuffix(filePath)
 		if suffix == "json" {
 			// 开始使用JSON的方式进行读取 ，此种方式支持不同级的参数的重名
-			bytes, err := ioutil.ReadFile(filePath)
-			if err != nil {
+			bytes, err2 := ioutil.ReadFile(filePath)
+			if err2 != nil {
+				err = err2
 				return
 			}
 			err = json.Unmarshal(bytes, &params)
 		} else if suffix == "xml" {
 			// 开始使用xml的方式进行读取 ，此种方式支持不同级的参数的重名
-			bytes, err := ioutil.ReadFile(filePath)
-			if err != nil {
+			bytes, err2 := ioutil.ReadFile(filePath)
+			if err2 != nil {
+				err = err2
 				return
 			}
 			err = xml.Unmarshal(bytes, &params)
+		} else if suffix == "yml" {
+			bytes, err2 := ioutil.ReadFile(filePath)
+			if err2 != nil {
+				err = err2
+				return
+			}
+			err = yaml.Unmarshal(bytes, &params)
 		} else {
 			// 开始使用正常的方式进行逐行读取 此种方式，并不支持参数重名
-			lines, err := common.ReadLines(filePath)
-			if err != nil {
+			lines, err2 := common.ReadLines(filePath)
+			if err2 != nil {
+				err = err2
 				return
 			}
 			// 开始逐行进行参数的读取

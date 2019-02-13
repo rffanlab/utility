@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"utility/config"
 )
 
 type TestStruct struct {
@@ -65,8 +65,13 @@ func main() {
 	//fmt.Println(mapT2)
 	//fmt.Println(mapT["Value"])
 	//fmt.Println(mapT2["Value"])
-	s := "2379h#fao9hj83#"
-	fmt.Println(strings.Index(s, "#"))
-	fmt.Println(s[:5])
+	//s := "2379h#fao9hj83#"
+	//fmt.Println(strings.Index(s, "#"))
+	//fmt.Println(s[:5])
+	params, err := config.ReadConfig("./test.conf")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(params)
 
 }
