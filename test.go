@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"utility/common"
+	"strings"
 )
 
 type TestStruct struct {
@@ -55,15 +55,18 @@ func main() {
 	//params["aadnaowenf"] = "43333"
 	//sign := encryption.Sign(params,"2333")
 	//fmt.Println(sign)
-	structT := TestStruct{
-		"你好",
-		233333,
-	}
-	mapT := common.ConvertStructToMapString(structT)
-	fmt.Println(mapT)
-	mapT2 := common.ConvertStructToMapStringWithTagName(structT, "json")
-	fmt.Println(mapT2)
-	fmt.Println(mapT["Value"])
-	fmt.Println(mapT2["Value"])
+	//structT := TestStruct{
+	//	"你好",
+	//	233333,
+	//}
+	//mapT := common.ConvertStructToMapString(structT)
+	//fmt.Println(mapT)
+	//mapT2 := common.ConvertStructToMapStringWithTagName(structT, "json")
+	//fmt.Println(mapT2)
+	//fmt.Println(mapT["Value"])
+	//fmt.Println(mapT2["Value"])
+	s := "2379h#fao9hj83#"
+	fmt.Println(strings.Index(s, "#"))
+	fmt.Println(s[:5])
 
 }

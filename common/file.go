@@ -330,7 +330,7 @@ func GetFileSuffix(filepath string) (suffix, body string) {
 		for i := 0; i < len(strs)-1; i++ {
 			tmpstr = tmpstr + strs[i]
 		}
-		return strs[1], tmpstr
+		return strs[len(strs)-1], tmpstr
 	}
 }
 
