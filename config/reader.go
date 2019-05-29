@@ -69,3 +69,7 @@ func ReadConfig(filePath string) (params map[string]interface{}, err error) {
 	}
 	return
 }
+
+func GetParamByKey(key string, params map[string]interface{}) (result interface{}, err error) {
+	return
+}
