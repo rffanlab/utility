@@ -10,8 +10,8 @@ import (
 	"utility/common"
 )
 
-func ReadConfig(filePath string) (params map[string]interface{}, err error) {
-	params = make(map[string]interface{})
+func ReadConfig(filePath string) (params map[string]string, err error) {
+	params = make(map[string]string)
 	if common.Exist(filePath) {
 		suffix, _ := common.GetFileSuffix(filePath)
 		if suffix == "json" {
