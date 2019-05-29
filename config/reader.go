@@ -76,11 +76,10 @@ func ReadConfig(filePath string) (params map[string]interface{}, err error) {
 /**
 我们约定俗称以 . 作为分隔符
 */
-func GetParamByKey(key string, params map[string]interface{}) (result interface{}, err error) {
+func GetParamByKey(key string, params map[string]interface{}) (result string) {
 	pointIndex := strings.Index(key, ".")
 	strs := strings.Split(key, ".")
 	if len(strs) <= 0 {
-		err = errors.New("Param Not Found")
 		return
 	}
 	for k, v := range params {
@@ -92,13 +91,19 @@ func GetParamByKey(key string, params map[string]interface{}) (result interface{
 					p := ConvertInterfaceToMap(v)
 					return GetParamByKey(key[pointIndex+1:], p)
 				} else {
-					err = errors.New("Param Not Found")
+
 					return
 				}
 			} else {
-				result = v
+				r, err := ConvertInterfaceToString(v)
+				result = r
+				if err != nil {
+					result = ""
+				}
 				return
 			}
+		} else {
+
 		}
 	}
 	return
