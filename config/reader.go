@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"utility/common"
 )
 
+// 读取配置文件
 func ReadConfig(filePath string) (params map[string]interface{}, err error) {
 	params = make(map[string]interface{})
 	if common.Exist(filePath) {
@@ -68,4 +70,41 @@ func ReadConfig(filePath string) (params map[string]interface{}, err error) {
 		err = errors.New("Path Not Exist，路径不存在")
 	}
 	return
+}
+
+func ReadConfigByStruct(data interface{}, filePath string) (interface{}, error) {
+	if common.Exist(filePath) {
+		suffix, _ := common.GetFileSuffix(filePath)
+		if suffix == "json" {
+			fmt.Println("开始json的解析了")
+			bytes, err := ioutil.ReadFile(filePath)
+			if err != nil {
+				return nil, err
+			}
+			err = json.Unmarshal(bytes, &data)
+			fmt.Println(data)
+			return data, err
+		} else if suffix == "xml" {
+			bytes, err := ioutil.ReadFile(filePath)
+			if err != nil {
+				return nil, err
+			}
+			err = xml.Unmarshal(bytes, &data)
+			return data, err
+		} else if suffix == "yml" {
+			bytes, err := ioutil.ReadFile(filePath)
+			if err != nil {
+				return nil, err
+			}
+			err = yaml.Unmarshal(bytes, &data)
+			return data, err
+		} else {
+			// 开始通过反射来进行
+			// 多次循环来进行数据的读取
+
+			return data, nil
+		}
+	} else {
+		return nil, errors.New("文件不存在")
+	}
 }

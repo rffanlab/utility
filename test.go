@@ -10,6 +10,10 @@ type TestStruct struct {
 	Value int
 }
 
+type WenhaoExample struct {
+	Wenhao string `json:"wenhao"`
+}
+
 func main() {
 	//d := downloader.Downloader{}
 	//d.SavePath = "D:/"
@@ -68,10 +72,15 @@ func main() {
 	//s := "2379h#fao9hj83#"
 	//fmt.Println(strings.Index(s, "#"))
 	//fmt.Println(s[:5])
-	params, err := config.ReadConfig("./test.conf")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(params)
+	//params, err := config.ReadConfig("./test.json")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(params)
+
+	var wenhao WenhaoExample
+	data, err := config.ReadConfigByStruct(wenhao, "./test.json")
+	fmt.Println(err)
+	fmt.Println(data)
 
 }
