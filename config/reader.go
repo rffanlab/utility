@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -68,6 +67,78 @@ func ReadConfig(filePath string) (params map[string]interface{}, err error) {
 		}
 	} else {
 		err = errors.New("Path Not Exist，路径不存在")
+	}
+	return
+}
+
+/**
+我们约定俗称以 . 作为分隔符
+*/
+func GetParamByKey(key string, params map[string]interface{}) (result string) {
+	pointIndex := strings.Index(key, ".")
+	strs := strings.Split(key, ".")
+	if len(strs) <= 0 {
+		return
+	}
+	for k, v := range params {
+		fmt.Println(k, v)
+		if k == strs[0] {
+			if len(strs) > 1 {
+				r := reflect.ValueOf(v)
+				if r.Kind() == reflect.Map {
+					p := ConvertInterfaceToMap(v)
+					return GetParamByKey(key[pointIndex+1:], p)
+				} else {
+
+					return
+				}
+			} else {
+				r, err := ConvertInterfaceToString(v)
+				result = r
+				if err != nil {
+					result = ""
+				}
+				return
+			}
+		} else {
+
+		}
+	}
+	return
+}
+
+func ConvertInterfaceToMap(i interface{}) (result map[string]interface{}) {
+	result = make(map[string]interface{})
+	r := reflect.ValueOf(i)
+	if r.Kind() == reflect.Map {
+		for _, key := range r.MapKeys() {
+			valueI := key.Interface()
+			value, err := ConvertInterfaceToString(valueI)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			result[value] = r.MapIndex(key).Interface()
+		}
+	}
+	return result
+}
+
+/**
+由于不会奇葩到用其他东西，例如数值尤其是小数点做值，因此只做这几点的转换
+*/
+func ConvertInterfaceToString(i interface{}) (result string, err error) {
+	r := reflect.ValueOf(i)
+	if r.Kind() == reflect.String {
+		result = i.(string)
+	} else if r.Kind() == reflect.Int {
+		value := i.(int)
+		result = strconv.Itoa(value)
+	} else if r.Kind() == reflect.Float32 {
+		result = fmt.Sprintf("%f", i)
+	} else if r.Kind() == reflect.Float64 {
+		result = fmt.Sprintf("%f", i)
+	} else {
+		err = errors.New(fmt.Sprintf("Unsupport kind to convert %r", r.Kind()))
 	}
 	return
 }
