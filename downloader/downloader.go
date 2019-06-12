@@ -66,6 +66,7 @@ func (c *Downloader)FullDownlod() error {
 	}else {
 		save = path.Base(c.TargetUrl)
 	}
+	c.SavePath = save
 	if acceptRange != "" {
 		 fmt.Println("可以开启多线程下载")
 		 fmt.Printf("获取系统线程数%d",system.GetThreadNum())
