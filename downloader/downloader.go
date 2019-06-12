@@ -31,6 +31,7 @@ func (c *Downloader) LiteDown() {
 	}else {
 		save = path.Base(c.TargetUrl)
 	}
+	c.SavePath = save
 	f, err := os.Create(save)
 	if err != nil {
 		panic(err)
