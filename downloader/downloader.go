@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"utility/common"
 	"utility/system"
 )
 
@@ -25,6 +26,7 @@ func (c *Downloader) LiteDown() {
 	if err != nil {
 		panic(err)
 	}
+	common.AutoCreateFolder(c.SavePath)
 	var save string
 	if c.SavePath != "" {
 		save = path.Join(c.SavePath,path.Base(c.TargetUrl))
@@ -60,6 +62,7 @@ func (c *Downloader)FullDownlod() error {
 	//fmt.Println(resp.ContentLength)
 	//acceptRange := resp.Header.Get("Accept-Ranges")
 	acceptRange :=""
+	common.AutoCreateFolder(c.SavePath)
 	var save string
 	if c.SavePath != "" {
 		save = path.Join(c.SavePath,path.Base(c.TargetUrl))
