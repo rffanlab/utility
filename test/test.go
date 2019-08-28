@@ -12,6 +12,7 @@ import (
 func main()  {
 
 	cmd := exec.Command("D:\\nginx-1.15.8\\nginx-1.15.8\\nginx.exe","-t")
+	cmd.Dir="D:\\nginx-1.15.8\\nginx-1.15.8"
 	stdout,err := cmd.StdoutPipe()
 	stderr,err := cmd.StderrPipe()
 	if err != nil {

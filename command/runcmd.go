@@ -3,12 +3,20 @@ package command
 import (
 	"github.com/astaxie/beego/logs"
 	"io/ioutil"
+	"os"
 	"os/exec"
+	"strings"
 )
 
 func RunCmd(theCmd string, args ...string) (out,errout string,err error) {
 	cmd := exec.Command(theCmd, args...)
 	// 获取输出对象，可以从该对象中读取输出结果
+	workingDir,err := GetWorkingDir(theCmd)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	cmd.Dir = workingDir
 	stdout, err := cmd.StdoutPipe()
 	stderr,err := cmd.StderrPipe()
 	if err != nil {
@@ -36,5 +44,28 @@ func RunCmd(theCmd string, args ...string) (out,errout string,err error) {
 		return
 	}
 	errout = string(opBytes)
+	return
+}
+
+func GetWorkingDir(cmdPath string) (working string ,err error) {
+	fi,err := os.Stat(cmdPath)
+	if err != nil{
+		logs.Error(err)
+		return
+	}
+	if fi.IsDir() {
+		working = cmdPath
+	}else {
+		cmdPath = strings.Replace(cmdPath,"\\","/",-1)
+		pos := strings.LastIndex(cmdPath,"/")
+		if pos>0 {
+			working = cmdPath[0:pos]
+		}else {
+			working = cmdPath
+		}
+
+	}
+
+
 	return
 }
