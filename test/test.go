@@ -1,17 +1,43 @@
 package main
 
 import (
-	"time"
-	"timer/utility"
-	"utility/system"
-
 	"fmt"
-	"strings"
+	"io/ioutil"
 	"net/url"
+	"os/exec"
+	"strings"
+	"timer/utility"
 )
 
 func main()  {
 
+	cmd := exec.Command("D:\\nginx-1.15.8\\nginx-1.15.8\\nginx.exe","-t")
+	cmd.Dir="D:\\nginx-1.15.8\\nginx-1.15.8"
+	stdout,err := cmd.StdoutPipe()
+	stderr,err := cmd.StderrPipe()
+	if err != nil {
+		fmt.Print(err)
+	}
+	defer stderr.Close()
+	defer stdout.Close()
+	if err = cmd.Start(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	opBytes,err := ioutil.ReadAll(stdout)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(opBytes))
+	opBytes,err = ioutil.ReadAll(stderr)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("-----------------开始打印错误-------------")
+	fmt.Println(string(opBytes))
 
 	// 短信发送在这里
 	//SendSMSExample()
@@ -87,10 +113,10 @@ func main()  {
 	//if err != nil{
 	//	fmt.Println(err)
 	//}
-	for i:=0;i<4;i++{
-		system.Ping("www.163.com")
-		time.Sleep(time.Duration(2)*time.Second)
-	}
+	//for i:=0;i<4;i++{
+	//	system.Ping("www.163.com")
+	//	time.Sleep(time.Duration(2)*time.Second)
+	//}
 
 
 
