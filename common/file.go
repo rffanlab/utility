@@ -344,3 +344,38 @@ func Exist(path string) bool {
 	return true
 
 }
+
+/**
+在特定目录下删除带有特定后缀的文件
+*/
+func RemoveFilesWithSuffix(targetPath, suffix string) (err error) {
+	files, err := ioutil.ReadDir(targetPath)
+	if err != nil {
+		logs.Error("读取目录失败")
+		logs.Error(err)
+		return
+	}
+	for _, v := range files {
+		if !v.IsDir() {
+			// 开始进行后缀判断
+			tmpFileName := v.Name()
+			if strings.HasSuffix(tmpFileName, suffix) {
+				fullPath := path.Join(targetPath, v.Name())
+				err := os.Remove(fullPath)
+				if err != nil {
+					logs.Error(err)
+				}
+			}
+		} else {
+			// 如果是文件夹
+			newPath := path.Join(targetPath, v.Name())
+			err := RemoveFilesWithSuffix(newPath, suffix)
+			if err != nil {
+				logs.Error("删除" + targetPath + "目录下的文件失败了")
+				logs.Error(err)
+			}
+
+		}
+	}
+	return
+}
