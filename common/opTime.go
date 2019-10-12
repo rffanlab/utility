@@ -122,3 +122,7 @@ func Day() string {
 func Today() string {
 	return fmt.Sprintf("%s_%s_%s", Year(), Month(), Day())
 }
+
+func TodayWithDash() string {
+	return time.Now().Format("2006-01-02")
+}
