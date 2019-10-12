@@ -379,3 +379,8 @@ func RemoveFilesWithSuffix(targetPath, suffix string) (err error) {
 	}
 	return
 }
+
+func GetSuffixByFileName(filename string) string {
+	index := strings.LastIndex(filename, ".")
+	return filename[index:len(filename)]
+}
