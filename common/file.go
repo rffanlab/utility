@@ -57,7 +57,11 @@ func MoveFile(srcPath, dstPath string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	os.Remove(srcPath)
+	err = os.Remove(srcPath)
+	if err != nil {
+		logs.Error(err)
+		return false, err
+	}
 	return true, nil
 }
 
@@ -273,6 +277,7 @@ func Filemd5(theFilePath string) (themd5 string, err error) {
 	hash := md5.New()
 	io.Copy(hash, file)
 	themd5 = hex.EncodeToString(hash.Sum(nil))
+	file.Close()
 	return
 }
 
@@ -383,7 +388,7 @@ func RemoveFilesWithSuffix(targetPath, suffix string) (err error) {
 func GetSuffixByFileName(filename string) string {
 	index := strings.LastIndex(filename, ".")
 	if index > 0 && index < len(filename) {
-		return filename[index:len(filename)]
+		return filename[index+1 : len(filename)]
 	}
 	return ""
 }
