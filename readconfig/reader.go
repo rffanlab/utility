@@ -5,12 +5,12 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/rffanlab/utility/common"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"reflect"
 	"strconv"
 	"strings"
-	"utility/common"
 )
 
 // 读取配置文件

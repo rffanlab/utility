@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"utility/config"
+	"github.com/rffanlab/utility/readconfig"
 )
 
 type TestStruct struct {
@@ -79,7 +79,7 @@ func main() {
 	//fmt.Println(params)
 
 	var wenhao WenhaoExample
-	data, err := config.ReadConfigByStruct(wenhao, "./test.json")
+	data, err := readconfig.ReadConfigByStruct(wenhao, "./test.json")
 	fmt.Println(err)
 	fmt.Println(data)
 
