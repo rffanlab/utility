@@ -72,7 +72,7 @@ func main() {
 	//s := "2379h#fao9hj83#"
 	//fmt.Println(strings.Index(s, "#"))
 	//fmt.Println(s[:5])
-	//params, err := config.ReadConfig("./test.json")
+	//params, err := readconfig.ReadConfig("./test.json")
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
