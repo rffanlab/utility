@@ -3,37 +3,36 @@ package common
 // 写于 2017-09-26 预计半年内是生效的。
 
 import (
-	"image"
-	"os"
-	"github.com/astaxie/beego/logs"
-	"image/png"
-	"github.com/boombuler/barcode/qr"
-	"github.com/boombuler/barcode"
-	"sort"
 	"crypto/sha1"
-	"io"
-	"strings"
-	"fmt"
-	"utility/request"
-	"io/ioutil"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/astaxie/beego/logs"
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/qr"
+	"github.com/rffanlab/utility/crequest"
+	"image"
+	"image/png"
+	"io"
+	"io/ioutil"
 	"net/url"
+	"os"
+	"sort"
+	"strings"
 )
 
 type Wechat struct {
-	Appkey string
+	Appkey    string
 	AppSecret string
-	Token string
+	Token     string
 }
 
-
 type WechatResponse struct {
-	AccessToken string `json:"access_token"`
-	ExpiresIn int `json:"expires_in"`
+	AccessToken  string `json:"access_token"`
+	ExpiresIn    int    `json:"expires_in"`
 	RefreshToken string `json:"refresh_token"`
-	Openid string `json:"openid"`
-	Scope string `json:"scope"`
+	Openid       string `json:"openid"`
+	Scope        string `json:"scope"`
 }
 
 /******************************************
@@ -43,37 +42,38 @@ type WechatResponse struct {
 
 // 通用错误结构体
 type WechatErrMsg struct {
-	Errcode int `json:"errcode"`
-	Errmsg string `json:"errmsg"`
+	Errcode int    `json:"errcode"`
+	Errmsg  string `json:"errmsg"`
 }
 
 // 获取access_token的结构体
 type AccessTokenResponse struct {
 	AccessToken string `json:"access_token"`
-	ExpiresIn int `json:"expires_in"`
+	ExpiresIn   int    `json:"expires_in"`
 }
+
 // 错误结构体
 type AccessTokenErrResponse struct {
-	Errcode int `json:"errcode"`
-	Errmsg string `json:"errmsg"`
+	Errcode int    `json:"errcode"`
+	Errmsg  string `json:"errmsg"`
 }
 
 // 获取用户基本信息结构体 相关介绍，请查看URL：https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140839
 type WechatUserinfo struct {
-	Subscribe int `json:"subscribe"`
-	Openid string `json:"openid"`
-	Nickname string `json:"nickname"`
-	Sex int `json:"sex"`
-	Language string `json:"language"`
-	City string `json:"city"`
-	Province string `json:"province"`
-	Country string `json:"country"`
-	Headimgurl string `json:"headimgurl"`
-	SubscribeTime int `json:"subscribe_time"`
-	Unionid string `json:"unionid"`
-	Remark string `json:"remark"`
-	Groupid int `json:"groupid"`
-	TagidList []int `json:"tagid_list"`
+	Subscribe     int    `json:"subscribe"`
+	Openid        string `json:"openid"`
+	Nickname      string `json:"nickname"`
+	Sex           int    `json:"sex"`
+	Language      string `json:"language"`
+	City          string `json:"city"`
+	Province      string `json:"province"`
+	Country       string `json:"country"`
+	Headimgurl    string `json:"headimgurl"`
+	SubscribeTime int    `json:"subscribe_time"`
+	Unionid       string `json:"unionid"`
+	Remark        string `json:"remark"`
+	Groupid       int    `json:"groupid"`
+	TagidList     []int  `json:"tagid_list"`
 }
 
 /******************************************
@@ -81,13 +81,11 @@ type WechatUserinfo struct {
 *                                         *
 *******************************************/
 
-
-
-func (c *Wechat) CheckConfigSet() (error) {
+func (c *Wechat) CheckConfigSet() error {
 	if c.Appkey == "" {
 		return errors.New("请设置微信APPKEY")
 	}
-	if c.AppSecret == ""{
+	if c.AppSecret == "" {
 		return errors.New("请设置微信APPSecret")
 	}
 	if c.Token == "" {
@@ -95,8 +93,6 @@ func (c *Wechat) CheckConfigSet() (error) {
 	}
 	return nil
 }
-
-
 
 //  方法：微信验证接口
 /*
@@ -106,19 +102,19 @@ func (c *Wechat) CheckConfigSet() (error) {
 *   @Param:nonce Type:string
 *   返回参数：
 *   @Param:bool Explain:返回确认是否正确
-*/
-func (c *Wechat) Verify(signature,timestamp,nonce string) (bool) {
-	sign := c.MakeSignatureWith(timestamp,nonce)
-	if signature == sign{
+ */
+func (c *Wechat) Verify(signature, timestamp, nonce string) bool {
+	sign := c.MakeSignatureWith(timestamp, nonce)
+	if signature == sign {
 		return true
-	}else {
+	} else {
 		return false
 	}
 }
 
-func (c *Wechat) MakeSignatureWith(timestamp,nonce string) string {
+func (c *Wechat) MakeSignatureWith(timestamp, nonce string) string {
 	err := c.CheckConfigSet()
-	if err != nil{
+	if err != nil {
 		logs.Error(err)
 	}
 	sl := []string{c.Token, timestamp, nonce}
@@ -136,7 +132,7 @@ func (c *Wechat) MakeSignatureWith(timestamp,nonce string) string {
 *   返回参数：
 *   @Param: Explain:
 *   @Param: Explain:
-*/
+ */
 func (c *Wechat) SendWechatMessageToClient() {
 
 }
@@ -149,7 +145,7 @@ func (c *Wechat) SendWechatMessageToClient() {
 *   返回参数：
 *   @Param: Explain:
 *   @Param: Explain:
-*/
+ */
 func (c *Wechat) AutoResponse() {
 
 }
@@ -177,14 +173,14 @@ func (c *Wechat) AutoResponse() {
 func (c *Wechat) MakeVerifyQrCode(codePath, returnUrl, msg string) (string, error) {
 	encodedUrl := strings.ToLower(url.QueryEscape(returnUrl))
 	encodeMsg := strings.ToLower(url.QueryEscape(msg))
-	logs.Info("编码后的url是：",encodedUrl)
-	urlmsg := "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+c.Appkey+"&redirect_uri="+encodedUrl+"&response_type=code&scope=snsapi_userinfo&state="+encodeMsg+"#wechat_redirect"
-	err := c.MakeQRCode(urlmsg,codePath)
-	if err != nil{
+	logs.Info("编码后的url是：", encodedUrl)
+	urlmsg := "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + c.Appkey + "&redirect_uri=" + encodedUrl + "&response_type=code&scope=snsapi_userinfo&state=" + encodeMsg + "#wechat_redirect"
+	err := c.MakeQRCode(urlmsg, codePath)
+	if err != nil {
 		logs.Info("生成二维码时出错，请查看下面的错误内容")
 		logs.Error(err)
 	}
-	return codePath,nil
+	return codePath, nil
 }
 
 // 方法：获取用户基本信息
@@ -196,25 +192,25 @@ func (c *Wechat) MakeVerifyQrCode(codePath, returnUrl, msg string) (string, erro
 *  返回参数：
 *  @Param: Type: Comment:
 *  @Param: Type: Comment:
-*/
-func (c *Wechat) GetUserWechatInfo(withCode string) (WechatResponse,error) {
+ */
+func (c *Wechat) GetUserWechatInfo(withCode string) (WechatResponse, error) {
 	var wr WechatResponse
 	err := c.CheckConfigSet()
-	if err != nil{
-		return wr,err
+	if err != nil {
+		return wr, err
 	}
-	getAccess_tokenUrl := "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+c.Appkey+"&secret="+c.AppSecret+"&code="+ withCode + "&grant_type=authorization_code"
-	r := request.Requests{}
-	theio,err := r.Get(getAccess_tokenUrl,nil)
-	if err != nil{
-		return wr,err
+	getAccess_tokenUrl := "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + c.Appkey + "&secret=" + c.AppSecret + "&code=" + withCode + "&grant_type=authorization_code"
+	r := crequest.Requests{}
+	theio, err := r.Get(getAccess_tokenUrl, nil)
+	if err != nil {
+		return wr, err
 	}
-	theBody,err := ioutil.ReadAll(theio)
-	if err != nil{
-		return wr,err
+	theBody, err := ioutil.ReadAll(theio)
+	if err != nil {
+		return wr, err
 	}
-	json.Unmarshal(theBody,&wr)
-	return wr,nil
+	json.Unmarshal(theBody, &wr)
+	return wr, nil
 }
 
 // 方法：获取微信公众号AccessToken
@@ -225,34 +221,32 @@ func (c *Wechat) GetUserWechatInfo(withCode string) (WechatResponse,error) {
 *  返回参数：
 *  @Param: Type:string Comment:AccessToken
 *  @Param: Type:string Comment:错误
-*/
-func (c *Wechat) GetAccessToken() (string,error) {
+ */
+func (c *Wechat) GetAccessToken() (string, error) {
 
-	requestUrl := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+c.Appkey+"&secret="+c.AppSecret
-	r := request.Requests{}
-	theio,err := r.Get(requestUrl,nil)
-	if err != nil{
+	requestUrl := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + c.Appkey + "&secret=" + c.AppSecret
+	r := crequest.Requests{}
+	theio, err := r.Get(requestUrl, nil)
+	if err != nil {
 		fmt.Println(err)
 	}
-	theBody,err := ioutil.ReadAll(theio)
-	if err != nil{
+	theBody, err := ioutil.ReadAll(theio)
+	if err != nil {
 		fmt.Println(err)
 	}
 	theStr := string(theBody)
-	if strings.Contains(theStr,"errcode"){
+	if strings.Contains(theStr, "errcode") {
 		fmt.Println("错了")
 		var acerr AccessTokenErrResponse
-		json.Unmarshal([]byte(theStr),&acerr)
-		return "",errors.New(acerr.Errmsg)
-	}else {
+		json.Unmarshal([]byte(theStr), &acerr)
+		return "", errors.New(acerr.Errmsg)
+	} else {
 		fmt.Println("没错")
 		var ac AccessTokenResponse
-		json.Unmarshal([]byte(theStr),&ac)
-		return ac.AccessToken,nil
+		json.Unmarshal([]byte(theStr), &ac)
+		return ac.AccessToken, nil
 	}
 }
-
-
 
 // 方法：检查用户是否订阅
 /*
@@ -262,55 +256,48 @@ func (c *Wechat) GetAccessToken() (string,error) {
 *  返回参数：
 *  @Param: Type: Comment:
 *  @Param: Type: Comment:
-*/
-func (c *Wechat) IsSubscribe(openid,access_token string) (bool, error) {
-	requestUrl := "https://api.weixin.qq.com/cgi-bin/user/info?access_token="+access_token+"&openid="+openid+"&lang=zh_CN "
-	r := request.Requests{}
-	theio,err := r.Get(requestUrl,nil)
-	if err != nil{
-		return false,err
-	}
-	theBody,err := ioutil.ReadAll(theio)
+ */
+func (c *Wechat) IsSubscribe(openid, access_token string) (bool, error) {
+	requestUrl := "https://api.weixin.qq.com/cgi-bin/user/info?access_token=" + access_token + "&openid=" + openid + "&lang=zh_CN "
+	r := crequest.Requests{}
+	theio, err := r.Get(requestUrl, nil)
 	if err != nil {
-		return false,err
+		return false, err
 	}
-	if strings.Contains(string(theBody),"errcode"){
+	theBody, err := ioutil.ReadAll(theio)
+	if err != nil {
+		return false, err
+	}
+	if strings.Contains(string(theBody), "errcode") {
 		var err WechatErrMsg
-		json.Unmarshal(theBody,&err)
-		return false,errors.New(err.Errmsg)
-	}else {
+		json.Unmarshal(theBody, &err)
+		return false, errors.New(err.Errmsg)
+	} else {
 		var accessToken WechatUserinfo
-		json.Unmarshal(theBody,&accessToken)
+		json.Unmarshal(theBody, &accessToken)
 		if accessToken.Subscribe == 1 {
-			return true,nil
-		}else {
-			return false,nil
+			return true, nil
+		} else {
+			return false, nil
 		}
 	}
 
 }
-
-
-
-
-
-
 
 /******************************************
 *              生成二维码相关             *
 *                                         *
 *******************************************/
 
-
-func (c *Wechat) WritePng(filename string, img image.Image) (error){
-	file,err := os.Create(filename)
-	if err != nil{
+func (c *Wechat) WritePng(filename string, img image.Image) error {
+	file, err := os.Create(filename)
+	if err != nil {
 		logs.Info("生成写入图片错误")
 		logs.Error(err)
 		return err
 	}
-	err2 := png.Encode(file,img)
-	if err2 != nil{
+	err2 := png.Encode(file, img)
+	if err2 != nil {
 		logs.Info("转换为png失败")
 		logs.Error(err2)
 		return err
@@ -319,14 +306,14 @@ func (c *Wechat) WritePng(filename string, img image.Image) (error){
 	return nil
 }
 
-func (c *Wechat)MakeQRCode(message string,fileName string) (error) {
-	code,err := qr.Encode(message,qr.L,qr.Auto)
-	if err != nil{
+func (c *Wechat) MakeQRCode(message string, fileName string) error {
+	code, err := qr.Encode(message, qr.L, qr.Auto)
+	if err != nil {
 		return err
 	}
-	code,err = barcode.Scale(code,300,300)
-	err = c.WritePng(fileName,code)
-	if err != nil{
+	code, err = barcode.Scale(code, 300, 300)
+	err = c.WritePng(fileName, code)
+	if err != nil {
 		return err
 	}
 	return nil
