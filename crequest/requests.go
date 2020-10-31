@@ -1,4 +1,4 @@
-package request
+package crequest
 
 import (
 	"bytes"
@@ -33,7 +33,7 @@ func (c *Requests) setHeaders(headerParams map[string]string) {
 	c.Headers = headerParams
 }
 
-func (c *Requests) AddHeader(key,value string)  {
+func (c *Requests) AddHeader(key, value string) {
 	if c.Headers == nil {
 		c.Headers = make(map[string]string)
 	}
